@@ -6,18 +6,21 @@
     }
   },
   "lib/foundry-devops": {
-    "rev": "efff097a87e70c3d15661c9f2a2daeae0b33d5d5"
+    "tag": {
+      "name": "0.0.11",
+      "rev": "d4a3bb4e5937e71193d943ea73ec2a6362cbe400"
+    }
   },
   "lib/openzeppelin-contracts": {
     "tag": {
-      "name": "v5.5.0",
-      "rev": "fcbae5394ae8ad52d8e580a3477db99814b9d565"
+      "name": "v4.8.3",
+      "rev": "0a25c1940ca220686588c4af3ec526f725fe2582"
     }
   },
   "lib/openzeppelin-contracts-upgradeable": {
     "tag": {
-      "name": "v5.5.0",
-      "rev": "aa677e9d28ed78fc427ec47ba2baef2030c58e7c"
+      "name": "v4.8.3",
+      "rev": "58fa0f81c4036f1a3b616fdffad2fd27e5d5ce21"
     }
   }
 }
