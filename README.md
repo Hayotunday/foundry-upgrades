@@ -1,66 +1,94 @@
-## Foundry
+# Foundry Upgrades
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A Foundry-based implementation of the UUPS (Universal Upgradeable Proxy Standard) pattern. This project demonstrates how to deploy upgradeable smart contracts that preserve state across contract upgrades while maintaining security controls.
 
-Foundry consists of:
+## What the product does
+This project shows how to build a versioned contract system using the UUPS proxy pattern. It includes BoxV1 (a simple value-storage contract) and BoxV2 (an upgraded version with additional functionality), plus the proxy infrastructure needed to delegate calls while preserving contract state.
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+The flow is:
+- deploy BoxV1 behind a proxy
+- initialize storage
+- upgrade to BoxV2 by authorizing a new implementation
+- call new BoxV2 functions while keeping existing state
 
-## Documentation
+## The problem it solves
+Once a smart contract is deployed, it cannot be changed. This creates a dilemma: bugs and missing features are permanent. An upgradeable proxy allows the implementation to be swapped out while preserving storage and user interaction patterns, enabling fixes and feature additions post-deployment.
 
-https://book.getfoundry.sh/
+## My specific contribution
+I implemented the UUPS proxy pattern using OpenZeppelin's contracts, designed BoxV1 and BoxV2 contracts to demonstrate versioning, and created deployment and upgrade scripts. The focus is on showing how to safely upgrade while preserving state.
 
-## Usage
+## Architecture
+The repository includes:
 
-### Build
+- `src/BoxV1.sol` — initial implementation with a simple value storage
+- `src/BoxV2.sol` — upgraded implementation with additional functionality
+- `src/sublesson/` — supporting files demonstrating delegate call and proxy concepts
+- `script/DeployBox.s.sol` — deployment script for the proxy and BoxV1
+- `script/UpgradeBox.s.sol` — upgrade script to migrate from V1 to V2
+- `test/DeployandUpgradeTest.t.sol` — tests for the upgrade flow
+- `lib/` — OpenZeppelin upgradeable contracts and Foundry dependencies
+- `foundry.toml` — Foundry configuration with remappings
 
-```shell
-$ forge build
-```
+## Technologies
+- Solidity
+- Foundry
+- Forge testing
+- OpenZeppelin upgradeable contracts
+- ERC1967 proxy pattern
+- UUPS upgrade mechanism
 
-### Test
+## Important technical decisions
+- The UUPS pattern is used instead of transparent proxies to reduce gas costs and complexity.
+- Both BoxV1 and BoxV2 use the Initializable pattern to prevent re-initialization after deployment.
+- An `_authorizeUpgrade` function restricts upgrade calls to the contract owner.
+- Identical storage layout is maintained between V1 and V2 to avoid state corruption.
+- The proxy is deployed at a standard ERC1967 address pattern, enabling predictable interaction.
 
-```shell
-$ forge test
-```
+## Key features
+- UUPS proxy infrastructure for safe upgrades
+- Version-based contract migration with preserved state
+- Owner-controlled upgrade authorization
+- Initializer pattern for post-deployment setup
+- Comprehensive upgrade tests
+- Clear separation between proxy and implementation concerns
 
-### Format
+## Screenshots
+No screenshots are included.
 
-```shell
-$ forge fmt
-```
+## Live demo
+No live deployment is included in the repository.
 
-### Gas Snapshots
+## Challenges and solutions
+The biggest challenge in upgradeable contracts is ensuring storage layout compatibility between versions. Changing the order or type of state variables causes data corruption during upgrade. This is solved by carefully designing BoxV2 to maintain the same storage layout as BoxV1.
 
-```shell
-$ forge snapshot
-```
+Another challenge is preventing accidental re-initialization after deployment. The solution is using OpenZeppelin's Initializable pattern and the `initializer` modifier.
 
-### Anvil
+## Setup instructions
+```bash
+# Install Foundry
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
 
-```shell
-$ anvil
-```
+# Clone
+git clone https://github.com/Hayotunday/foundry-upgrades.git
+cd foundry-upgrades
 
-### Deploy
+# Install dependencies
+forge install
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+# Build
+forge build
 
-### Cast
+# Run tests
+forge test
 
-```shell
-$ cast <subcommand>
-```
+# Deploy BoxV1 and proxy
+forge script script/DeployBox.s.sol --rpc-url <rpc-url> --private-key <private-key>
 
-### Help
+# Upgrade to BoxV2
+forge script script/UpgradeBox.s.sol --rpc-url <rpc-url> --private-key <private-key>
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+# Optional
+forge fmt
+forge snapshot
 ```
